@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#082f73">
+<title>Fun Games Hub</title>
+<style>
+:root{--navy:#082f73;--blue:#1765ad;--green:#a9ed8d;--bg:#f3f7ff;--ink:#14233d}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,var(--navy),var(--blue));color:white;padding:24px 18px 34px}
+nav,.hero,.main{max-width:1000px;margin:auto}nav{font-weight:800;font-size:1.15rem}
+.hero{padding:35px 0 5px}.hero h1{font-size:clamp(2.3rem,8vw,4rem);margin:0 0 12px}.hero p{line-height:1.6;color:#e4efff}.hero a{display:inline-block;background:var(--green);color:#143b24;text-decoration:none;font-weight:bold;padding:13px 18px;border-radius:12px;margin-top:8px}
+.main{padding:28px 16px 45px}.main h2{color:var(--navy);font-size:1.8rem;margin-bottom:6px}.intro{color:#66748a;margin-top:0}
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:white;border:1px solid #dce6f4;border-radius:18px;padding:19px;box-shadow:0 7px 22px #082f7310}
+.card h3{color:var(--navy);margin:0 0 7px;font-size:1.25rem}.desc{color:#64728a;margin:0 0 12px}
+input{width:100%;padding:13px;border:1px solid #bdcbe0;border-radius:10px;font-size:1rem;margin:7px 0}
+button{border:0;border-radius:10px;padding:12px 15px;background:var(--navy);color:white;font-weight:bold;font-size:.95rem;margin:6px 5px 0 0;cursor:pointer}
+button.alt{background:#e9f0fb;color:var(--navy)}button:active{transform:scale(.98)}
+.msg{min-height:26px;margin:12px 0 0;font-weight:bold;color:#15599b;line-height:1.4}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choices button{margin:0;background:#e9f0fb;color:var(--navy)}
+footer{text-align:center;padding:22px;background:#06265d;color:#e4efff;font-size:.9rem}
+@media(max-width:650px){.games{grid-template-columns:1fr}.hero{padding-top:25px}}
+</style>
+</head>
+<body>
+<header><nav>🎮 FUN GAMES HUB</nav><section class="hero"><h1>Play. Learn.<br><span style="color:#a9ed8d">Have Fun!</span></h1><p>Four mini games in one place. Choose a game, try your best and enjoy!</p><a href="#games">Explore Games ↓</a></section></header>
+<main class="main" id="games">
+<h2>Choose Your Game</h2><p class="intro">Four simple games. One place. Have fun!</p>
+<div class="games">
+<section class="card">
+<h3>🔤 Word Guess</h3><p class="desc">Hint: A popular programming language beginning with P.</p>
+<input id="wordAnswer" type="text" placeholder="Type your answer" autocomplete="off">
+<button id="wordCheck">Check answer</button><button class="alt" id="wordReset">Reset</button>
+<p class="msg" id="wordMessage" aria-live="polite">Ready? Type your guess.</p>
+</section>
+<section class="card">
+<h3>🎯 Number Guess</h3><p class="desc">Guess the secret number between 1 and 20.</p>
+<input id="numberAnswer" type="number" min="1" max="20" placeholder="Enter 1 to 20">
+<button id="numberCheck">Check number</button><button class="alt" id="numberReset">New number</button>
+<p class="msg" id="numberMessage" aria-live="polite">I have selected a number. Good luck!</p>
+</section>
+<section class="card">
+<h3>🌍 Country Quiz</h3><p class="desc" id="countryQuestion"></p>
+<div class="choices" id="countryChoices"></div>
+<button class="alt" id="countryNext">Next question</button>
+<p class="msg" id="countryMessage" aria-live="polite"></p>
+</section>
+<section class="card">
+<h3>🔀 Word Scramble</h3><p class="desc">Arrange the letters to make a correct word:</p>
+<p style="font-size:1.5rem;font-weight:bold;letter-spacing:5px;color:#1765ad" id="scrambledLetters">NOPYHT</p>
+<input id="scrambleAnswer" type="text" placeholder="Your answer" autocomplete="off">
+<button id="scrambleCheck">Check answer</button><button class="alt" id="scrambleNext">New word</button>
+<p class="msg" id="scrambleMessage" aria-live="polite">Hint: It is used to write programs.</p>
+</section>
+</div></main>
+<footer>Learning project · Fun Games Hub</footer>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  // WORD GUESS
+  const wordList = [
+    {word:"PYTHON",hint:"A popular programming language beginning with P."},
+    {word:"COMPUTER",hint:"An electronic device used for computing."},
+    {word:"BROWSER",hint:"An app used to visit websites."}
+  ];
+  let wordIndex=0;
+  function checkWord(){
+    const answer=$("wordAnswer").value.trim().toUpperCase();
+    if(!answer){$("wordMessage").textContent="Please type your answer first.";return;}
+    $("wordMessage").textContent=answer===wordList[wordIndex].word?"🎉 Correct! Well done!":"Not correct yet. Try again!";
+  }
+  function resetWord(){
+    wordIndex=(wordIndex+1)%wordList.length;
+    $("wordAnswer").value="";
+    $("wordMessage").textContent="New hint: "+wordList[wordIndex].hint;
+  }
+  $("wordCheck").addEventListener("click",checkWord);
+  $("wordReset").addEventListener("click",resetWord);
+
+  // NUMBER GUESS
+  let secretNumber= Math.floor(Math.random()*20)+1;
+  function checkNumber(){
+    const raw=$("numberAnswer").value;
+    const guess=Number(raw);
+    if(raw===""||!Number.isInteger(guess)||guess<1||guess>20){$("numberMessage").textContent="Please enter a whole number from 1 to 20.";return;}
+    if(guess===secretNumber){$("numberMessage").textContent="🎉 Correct! You found the number!";}
+    else if(guess<secretNumber){$("numberMessage").textContent="Too low. Try a bigger number.";}
+    else{$("numberMessage").textContent="Too high. Try a smaller number.";}
+  }
+  function resetNumber(){
+    secretNumber=Math.floor(Math.random()*20)+1;
+    $("numberAnswer").value="";
+    $("numberMessage").textContent="A new number is ready. Guess again!";
+  }
+  $("numberCheck").addEventListener("click",checkNumber);
+  $("numberReset").addEventListener("click",resetNumber);
+
+  // COUNTRY QUIZ
+  const questions=[
+    {q:"Which country is famous for the Eiffel Tower?",a:["India","France","Japan","Brazil"],correct:"France"},
+    {q:"In which country is the Taj Mahal?",a:["India","Italy","Canada","Egypt"],correct:"India"},
+    {q:"Tokyo is a city in which country?",a:["Spain","Japan","Australia","Nepal"],correct:"Japan"},
+    {q:"Which country is often described as boot-shaped?",a:["Italy","China","Mexico","Kenya"],correct:"Italy"}
+  ];
+  let questionIndex=0,answered=false;
+  function renderQuestion(){
+    answered=false;
+    const q=questions[questionIndex];
+    $("countryQuestion").textContent=q.q;
+    $("countryMessage").textContent="";
+    $("countryChoices").innerHTML="";
+    q.a.forEach(option=>{
+      const b=document.createElement("button");
+      b.type="button";b.textContent=option;
+      b.addEventListener("click",()=>answerCountry(option));
+      $("countryChoices").appendChild(b);
+    });
+  }
+  function answerCountry(option){
+    if(answered)return;answered=true;
+    const correct=questions[questionIndex].correct;
+    $("countryMessage").textContent=option===correct?"✅ Correct answer!":"❌ Correct answer: "+correct;
+  }
+  $("countryNext").addEventListener("click",()=>{
+    questionIndex=(questionIndex+1)%questions.length;renderQuestion();
+  });
+
+  // WORD SCRAMBLE
+  const scrambleList=[
+    {letters:"NOPYHT",answer:"PYTHON",hint:"A programming language."},
+    {letters:"MOCUPTER",answer:"COMPUTER",hint:"An electronic device."},
+    {letters:"WESRBOR",answer:"BROWSER",hint:"Used to open websites."},
+    {letters:"KBOO",answer:"BOOK",hint:"You can read this."}
+  ];
+  let scrambleIndex=0;
+  function renderScramble(){
+    const item=scrambleList[scrambleIndex];
+    $("scrambledLetters").textContent=item.letters;
+    $("scrambleAnswer").value="";
+    $("scrambleMessage").textContent="Hint: "+item.hint;
+  }
+  function checkScramble(){
+    const answer=$("scrambleAnswer").value.trim().toUpperCase();
+    if(!answer){$("scrambleMessage").textContent="Please type your answer first.";return;}
+    $("scrambleMessage").textContent=answer===scrambleList[scrambleIndex].answer?"🎉 Correct! Great job!":"Not quite. Try again!";
+  }
+  $("scrambleCheck").addEventListener("click",checkScramble);
+  $("scrambleNext").addEventListener("click",()=>{
+    scrambleIndex=(scrambleIndex+1)%scrambleList.length;renderScramble();
+  });
+
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
